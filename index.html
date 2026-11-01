@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MechCraft - KGBTC Mechanical Assignment Portal</title>
+  <title>MechCraft - Mechanical Assignment Portal</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -86,7 +86,7 @@
 
   <!-- TOP NOTICE BAR -->
   <div class="bg-gradient-to-r from-brand-600 to-rose-600 text-white text-xs sm:text-sm py-2 px-4 text-center font-medium tracking-wide">
-    <i class="fa-solid font-bold fa-bolt mr-2 animate-pulse"></i> EXCLUSIVE FOR KGBTC KOZHIKODE MECHANICAL DEPARTMENT (64 STUDENTS ONLY)
+    <i class="fa-solid font-bold fa-bolt mr-2 animate-pulse"></i> EXCLUSIVE FOR MECHANICAL DEPARTMENT (STUDENTS ONLY)
   </div>
 
   <!-- NAVIGATION BAR -->
@@ -97,14 +97,14 @@
       </div>
       <div>
         <span class="font-heading text-xl font-bold text-white tracking-wider block leading-tight">MECH<span class="text-brand-500">CRAFT</span></span>
-        <span class="text-[10px] text-gray-400 font-mono tracking-widest block uppercase">KGBTC Kozhikode</span>
+        <span class="text-[10px] text-gray-400 font-mono tracking-widest block uppercase">Kozhikode</span>
       </div>
     </div>
 
     <!-- Link to Admin Portal -->
-    <a href="admin.html" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700 border border-gray-700 flex items-center">
+    <!--a href="admin.html" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700 border border-gray-700 flex items-center">
       <i class="fa-solid fa-user-shield mr-1.5 text-brand-500"></i> Admin Portal
-    </a>
+    </a-->
   </nav>
 
   <!-- MAIN STUDENT WORKSPACE CONTAINER -->
@@ -123,7 +123,7 @@
       </h1>
 
       <p class="max-w-2xl mx-auto text-gray-400 text-sm sm:text-base leading-relaxed">
-        Specially tailored for the 64 Mechanical Engineering students at KGBTC Kozhikode. Get high-precision drawing sheets, complete assignment writing, and verified lab record notes done seamlessly!
+        Specially tailored for the 64 Mechanical Engineering students at Kozhikode. Get high-precision drawing sheets, complete assignment writing, and verified lab record notes done seamlessly!
       </p>
 
       <!-- Quick Jump Buttons -->
@@ -190,13 +190,13 @@
             </div>
             <h3 class="text-lg font-bold text-white">Engineering Graphics Sheets</h3>
             <p class="text-gray-400 text-xs leading-relaxed">
-              Clean 2D/3D projections, isometric views, sectioning, and machine component drawings accurately drafted.
+              Clean 2D projections and machine component drawings accurately drafted.
             </p>
           </div>
           <div class="mt-6 pt-4 border-t border-gray-800/80 flex items-center justify-between">
             <div>
               <span class="text-xs text-gray-500 block">Starting at</span>
-              <span class="text-lg font-bold text-white">₹49 <span class="text-xs font-normal text-gray-400">/ sheet</span></span>
+              <span class="text-lg font-bold text-white">₹10 <span class="text-xs font-normal text-gray-400">/ sheet</span></span>
             </div>
             <button onclick="selectPackage('Engineering Graphics Drawing Sheet', 49)" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-brand-500 text-gray-300 hover:text-white text-xs font-medium transition-all">
               Select
@@ -218,7 +218,7 @@
           <div class="mt-6 pt-4 border-t border-gray-800/80 flex items-center justify-between">
             <div>
               <span class="text-xs text-gray-500 block">Starting at</span>
-              <span class="text-lg font-bold text-white">₹79 <span class="text-xs font-normal text-gray-400">/ record</span></span>
+              <span class="text-lg font-bold text-white">₹89 <span class="text-xs font-normal text-gray-400">/ One work's record</span></span>
             </div>
             <button onclick="selectPackage('Complete Lab Record Notes', 79)" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-brand-500 text-gray-300 hover:text-white text-xs font-medium transition-all">
               Select
@@ -319,7 +319,7 @@
           <label class="block text-xs font-semibold text-gray-200">
             Student Photo / Selfie Verification *
           </label>
-          <p class="text-[11px] text-gray-400">Take a live photo using your camera. This image will be uploaded directly to Cloudinary verification storage.</p>
+          <p class="text-[11px] text-gray-400">Take a live photo using your camera. This image will be uploaded directly to Server verification storage.</p>
 
           <div class="flex flex-col sm:flex-row items-center gap-4">
             <!-- Camera / Captured Image Preview Box -->
@@ -351,13 +351,13 @@
 
         <!-- Submit Button -->
         <button type="submit" id="submitBtn" class="w-full py-4 bg-gradient-to-r from-brand-600 to-rose-600 hover:from-brand-500 hover:to-rose-500 text-white font-bold rounded-xl shadow-xl shadow-brand-500/20 text-sm tracking-wide transition-all transform active:scale-95 flex items-center justify-center">
-          <i class="fa-solid fa-paper-plane mr-2"></i> SUBMIT ASSIGNMENT REQUEST
+          <i class="fa-solid fa-paper-plane mr-2"></i> SUBMIT WORK REQUEST
         </button>
       </form>
     </section>
 
     <!-- SUPPORT TEAM & CONTRIBUTORS SECTION -->
-    <section class="space-y-6">
+    <!--section class="space-y-6">
       <div class="text-center space-y-2">
         <h2 class="text-2xl sm:text-3xl font-heading font-bold text-white">Our Support Team & Creators</h2>
         <p class="text-gray-400 text-xs sm:text-sm">Dedicated Mechanical Department crew managing drawing sheets and note execution.</p>
@@ -394,10 +394,11 @@
           <h4 class="text-xs font-bold text-white">Coordinator 6</h4>
           <span class="text-[10px] text-brand-500 font-mono">Delivery & Desk</span>
         </div>
+        <p class="text-[10px] text-gray-600">* Built exclusively for 64 Classmates • Direct Server & Server Secured</p>
       </div>
     </section>
 
-  </div>
+  </div->
 
   <!-- PAYMENT & SUCCESS CONFIRMATION MODAL -->
   <div id="paymentModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
@@ -420,15 +421,15 @@
       <div class="bg-gray-950 p-4 rounded-xl border border-gray-800 text-center space-y-3">
         <div class="text-xs font-semibold text-brand-500 uppercase tracking-wide">Advance Payment QR Code</div>
         <p class="text-[11px] text-gray-400">
-          If possible, please pay an advance amount to help us purchase drawing sheets and writing materials.
+          If possible, please pay an advance amount (5₹ -10₹) to help us purchase drawing sheets and writing materials.
         </p>
         
         <div class="bg-white p-3 rounded-lg inline-block shadow-md">
-          <img id="upiQrCode" src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi://pay?pa=kgbtc-mech@upi&pn=KGBTC%20Mech%20Desk&cu=INR" alt="UPI Advance Payment QR" class="w-40 h-40">
+          <img id="upiQrCode" src="qr.jpg" onerror="this.src='https://placehold.co/160x160/ffffff/000000?text=qr.jpg+Not+Found'" alt="UPI Advance Payment QR" class="w-40 h-40 object-contain">
         </div>
 
         <div class="text-[11px] font-mono text-gray-400">
-          UPI ID: <span class="text-white font-semibold">kgbtc-mech@upi</span>
+          UPI ID: <span class="text-white font-semibold">mechtech@fam</span>
         </div>
       </div>
 
@@ -440,8 +441,8 @@
 
   <!-- FOOTER -->
   <footer class="border-t border-gray-800/80 bg-gray-950 py-6 px-4 text-center text-xs text-gray-500 space-y-1">
-    <p>© 2026 MechCraft KGBTC Kozhikode - Mechanical Engineering Department</p>
-    <p class="text-[10px] text-gray-600">Built exclusively for 64 Classmates • Direct Firebase & Cloudinary Secured</p>
+    <p>© 2026 MechCraft Kozhikode - Mechanical Engineering Department</p>
+    <p class="text-[10px] text-gray-600">Built exclusively for 64 Classmates • Direct Server & Server Secured</p>
   </footer>
 
   <!-- FIREBASE SDK INITIALIZATION -->
@@ -580,7 +581,7 @@
 
         const imageUrl = await uploadToCloudinary(capturedBlob);
 
-        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Saving Order to Firebase...`;
+        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i> Saving Order to Server...`;
 
         const orderData = {
           name: document.getElementById('studentName').value.trim(),
