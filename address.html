@@ -1,0 +1,432 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYS.ROOT // TARGET RECORD EXTRACTION</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Fira Code', monospace;
+            background-color: #030704;
+            color: #00ff41;
+            overflow-x: hidden;
+        }
+        /* CRT Scanline effect */
+        .scanlines {
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.35) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+        .glow-text {
+            text-shadow: 0 0 8px rgba(0, 255, 65, 0.6);
+        }
+        .glow-border {
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.15), inset 0 0 10px rgba(0, 255, 65, 0.05);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050d07;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #008f11;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00ff41;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .cursor-blink {
+            animation: blink 1s infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative flex flex-col justify-between selection:bg-green-500 selection:text-black">
+    
+    <!-- Matrix Rain Background Canvas -->
+    <canvas id="matrix-bg" class="fixed inset-0 z-0 opacity-20 pointer-events-none"></canvas>
+    
+    <!-- CRT Scanline Overlay -->
+    <div class="fixed inset-0 z-50 scanlines"></div>
+
+    <!-- Main Container -->
+    <div class="relative z-10 w-full max-w-6xl mx-auto p-3 sm:p-6 flex-grow flex flex-col gap-4">
+        
+        <!-- Top System Status Bar -->
+        <header class="border border-green-500/40 bg-black/80 backdrop-blur-sm rounded-lg p-3 sm:p-4 glow-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full bg-green-500 animate-ping"></div>
+                <div>
+                    <h1 class="text-sm sm:text-lg font-bold tracking-wider glow-text">ROOT@MAINFRAME:~# RECORD_INTERCEPT</h1>
+                    <p class="text-xs text-green-400/70">ENCRYPTION: AES-256-GCM // NODE: KL-KZD-673308</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs w-full sm:w-auto justify-between sm:justify-end">
+                <span class="px-2 py-1 rounded bg-green-950/60 border border-green-500/30 text-green-300" id="sys-clock">00:00:00 UTC</span>
+                <span class="px-2 py-1 rounded bg-red-950/50 border border-red-500/40 text-red-400 font-semibold">STATUS: BREACHED</span>
+            </div>
+        </header>
+
+        <!-- Main Grid Layout -->
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-grow">
+            
+            <!-- Left Column: Live Terminal & Execution Controls -->
+            <div class="lg:col-span-5 flex flex-col gap-4">
+                
+                <!-- Interactive Terminal Window -->
+                <div class="border border-green-500/40 bg-black/85 rounded-lg p-4 glow-border flex flex-col h-72 sm:h-80 lg:h-full">
+                    <div class="flex items-center justify-between border-b border-green-500/30 pb-2 mb-3">
+                        <span class="text-xs font-semibold tracking-widest text-green-400">// TERMINAL_EXEC_LOG</span>
+                        <div class="flex gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full bg-green-500/40"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-green-500/40"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Log Output Area -->
+                    <div id="terminal-logs" class="flex-grow overflow-y-auto text-xs space-y-1.5 font-mono pr-1">
+                        <!-- Logs injected via JS -->
+                    </div>
+
+                    <!-- Terminal Input Prompt -->
+                    <div class="mt-3 pt-2 border-t border-green-500/30 flex items-center gap-2 text-xs">
+                        <span class="text-green-500 font-bold">root@sys:~$</span>
+                        <input type="text" id="cmd-input" placeholder="Type 'scan' or 'dump'..." autocomplete="off"
+                            class="bg-transparent border-none outline-none text-green-300 w-full placeholder-green-700/70 focus:ring-0">
+                    </div>
+                </div>
+
+                <!-- Action Control Panel -->
+                <div class="border border-green-500/40 bg-black/85 rounded-lg p-4 glow-border grid grid-cols-2 gap-3">
+                    <button id="btn-rescan" class="col-span-1 py-2.5 px-3 rounded bg-green-950/60 hover:bg-green-500 hover:text-black border border-green-500/50 text-xs font-bold tracking-wider transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer">
+                        <span>[ RE-RUN DUMP ]</span>
+                    </button>
+                    <button id="btn-copy" class="col-span-1 py-2.5 px-3 rounded bg-green-500/20 hover:bg-green-500 hover:text-black border border-green-500 text-xs font-bold tracking-wider transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer">
+                        <span>[ COPY PAYLOAD ]</span>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Decrypted Target Dossier (Extracted Image Data) -->
+            <div class="lg:col-span-7 border border-green-500/40 bg-black/85 rounded-lg p-4 sm:p-5 glow-border flex flex-col justify-between">
+                <div>
+                    <!-- Dossier Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-green-500/30 pb-3 mb-4 gap-2">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs px-2 py-0.5 rounded bg-green-500 text-black font-bold">EXTRACTED</span>
+                                <h2 class="text-base sm:text-lg font-bold tracking-wide glow-text">TARGET_ADDRESS_REGISTRY</h2>
+                            </div>
+                            <p class="text-xs text-green-400/70 mt-1">DATABASE: GOV_CIVIL_RECORDS // TABLE: PERMANENT_AND_NEW_ADDR</p>
+                        </div>
+                        <div class="text-left sm:text-right">
+                            <span class="text-xs text-green-400 block">INTEGRITY: 100%</span>
+                            <span class="text-[11px] text-green-500/60" id="hex-hash">SHA256: 8F94E2...C19A</span>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="mb-5">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span id="progress-label" class="text-green-400">DECRYPTION COMPLETE</span>
+                            <span id="progress-percent" class="font-bold">100%</span>
+                        </div>
+                        <div class="w-full h-2 bg-green-950 rounded-full overflow-hidden border border-green-500/30">
+                            <div id="progress-bar" class="h-full bg-green-500 transition-all duration-300" style="width: 100%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Extracted Fields Grid -->
+                    <div class="space-y-3" id="data-fields">
+                        
+                        <!-- Full Address Block -->
+                        <div class="p-3 rounded bg-green-950/20 border border-green-500/30 hover:border-green-400 transition-colors">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[11px] uppercase tracking-widest text-green-500/80">[01] FULL_ADDRESS_STRING</span>
+                                <span class="text-[10px] text-green-500/50">VARCHAR(255)</span>
+                            </div>
+                            <div class="text-sm sm:text-base font-semibold text-green-200 break-words scramble-target" data-value="Nidiyaparambath(HO) Kunnummakkara (PO) via chombala 673308, Kozhikode">
+                                Nidiyaparambath(HO) Kunnummakkara (PO) via chombala 673308, Kozhikode
+                            </div>
+                        </div>
+
+                        <!-- 2-Column Sub-grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            
+                            <!-- Sub Locality 1 -->
+                            <div class="p-3 rounded bg-green-950/20 border border-green-500/30 hover:border-green-400 transition-colors">
+                                <span class="text-[11px] uppercase tracking-widest text-green-500/80 block mb-1">[02] SUB_LOCALITY_1</span>
+                                <div class="text-sm font-semibold text-green-200 scramble-target" data-value="Kunnummakkara">
+                                    Kunnummakkara
+                                </div>
+                            </div>
+
+                            <!-- Sub Locality 2 -->
+                            <div class="p-3 rounded bg-green-950/20 border border-green-500/30 hover:border-green-400 transition-colors">
+                                <span class="text-[11px] uppercase tracking-widest text-green-500/80 block mb-1">[03] SUB_LOCALITY_2</span>
+                                <div class="text-sm font-semibold text-green-200 scramble-target" data-value="Orkkatteri">
+                                    Orkkatteri
+                                </div>
+                            </div>
+
+                            <!-- Locality -->
+                            <div class="p-3 rounded bg-green-950/20 border border-green-500/30 hover:border-green-400 transition-colors">
+                                <span class="text-[11px] uppercase tracking-widest text-green-500/80 block mb-1">[04] LOCALITY</span>
+                                <div class="text-sm font-semibold text-green-200 scramble-target" data-value="Vadakara">
+                                    Vadakara
+                                </div>
+                            </div>
+
+                            <!-- Post Office -->
+                            <div class="p-3 rounded bg-green-950/20 border border-green-500/30 hover:border-green-400 transition-colors">
+                                <span class="text-[11px] uppercase tracking-widest text-green-500/80 block mb-1">[05] POST_OFFICE</span>
+                                <div class="text-sm font-semibold text-green-200 scramble-target" data-value="Kunnummakkara BO">
+                                    Kunnummakkara BO
+                                </div>
+                            </div>
+
+                            <!-- Pincode -->
+                            <div class="p-3 rounded bg-green-950/20 border border-green-500/30 hover:border-green-400 transition-colors">
+                                <span class="text-[11px] uppercase tracking-widest text-green-500/80 block mb-1">[06] PINCODE</span>
+                                <div class="text-sm font-bold text-green-300 tracking-wider scramble-target" data-value="673308">
+                                    673308
+                                </div>
+                            </div>
+
+                            <!-- District -->
+                            <div class="p-3 rounded bg-green-950/20 border border-green-500/30 hover:border-green-400 transition-colors">
+                                <span class="text-[11px] uppercase tracking-widest text-green-500/80 block mb-1">[07] DISTRICT</span>
+                                <div class="text-sm font-semibold text-green-200 scramble-target" data-value="KOZHIKODE">
+                                    KOZHIKODE
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- State Block -->
+                        <div class="p-3 rounded bg-green-950/20 border border-green-500/30 hover:border-green-400 transition-colors flex justify-between items-center">
+                            <div>
+                                <span class="text-[11px] uppercase tracking-widest text-green-500/80 block mb-1">[08] STATE_JURISDICTION</span>
+                                <div class="text-sm font-bold text-green-200 scramble-target" data-value="KERALA">
+                                    KERALA
+                                </div>
+                            </div>
+                            <span class="text-xs px-2.5 py-1 rounded bg-green-500/10 border border-green-500/40 text-green-400">VERIFIED_NODE</span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Raw JSON Footer Preview -->
+                <div class="mt-4 pt-3 border-t border-green-500/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-[11px] text-green-500/70">
+                    <span>SYNC_STATE: PERMANENT_ADDR == NEW_ADDR [MATCH]</span>
+                    <span class="cursor-blink">_</span>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Custom Notification Toast (Replaces alert) -->
+    <div id="toast-box" class="fixed bottom-4 right-4 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-black border border-green-400 text-green-300 px-4 py-3 rounded-lg shadow-lg glow-border text-xs font-bold flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-green-400"></span>
+        <span id="toast-msg">PAYLOAD COPIED TO CLIPBOARD</span>
+    </div>
+
+    <script>
+        // 1. Matrix Digital Rain Canvas
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%+-/~{[|`]}';
+        const fontSize = 14;
+        let columns = Math.floor(canvas.width / fontSize);
+        let drops = Array(columns).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(3, 7, 4, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px Fira Code';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 45);
+
+        // 2. Live UTC Clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('sys-clock').textContent = now.toISOString().split('T')[1].split('.')[0] + ' UTC';
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // 3. Text Decryption Scramble Effect
+        const scrambleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!<>-_\\/[]{}—=+*^?#';
+        
+        function scrambleText(element) {
+            const originalText = element.getAttribute('data-value');
+            let iteration = 0;
+            clearInterval(element.interval);
+
+            element.interval = setInterval(() => {
+                element.innerText = originalText
+                    .split('')
+                    .map((letter, index) => {
+                        if (letter === ' ') return ' ';
+                        if (index < iteration) {
+                            return originalText[index];
+                        }
+                        return scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+                    })
+                    .join('');
+
+                if (iteration >= originalText.length) {
+                    clearInterval(element.interval);
+                }
+                iteration += 1 / 2;
+            }, 25);
+        }
+
+        // 4. Terminal Sequence & Logs
+        const terminalLogs = document.getElementById('terminal-logs');
+        const bootSequence = [
+            { text: "[SYS] Initializing secure socket tunnel...", delay: 100, color: "text-green-400" },
+            { text: "[NET] Connecting to endpoint 10.244.89.12:443...", delay: 400, color: "text-green-400" },
+            { text: "[AUTH] Bypassing session token validation...", delay: 800, color: "text-yellow-400" },
+            { text: "[OK] Handshake established. Elevated privileges acquired.", delay: 1200, color: "text-green-300" },
+            { text: "[SQL] Querying PERMANENT_ADDRESS_DETAILS...", delay: 1600, color: "text-green-400" },
+            { text: "[DUMP] Extracting Pin: 673308 | Dist: KOZHIKODE", delay: 2000, color: "text-green-300" },
+            { text: "[SYNC] Verifying NEW_ADDRESS_DETAILS mirror...", delay: 2400, color: "text-green-400" },
+            { text: "[SUCCESS] 8/8 fields decrypted and verified.", delay: 2800, color: "text-green-400 font-bold" }
+        ];
+
+        function addLog(text, colorClass = "text-green-400") {
+            const line = document.createElement('div');
+            line.className = colorClass;
+            line.textContent = `> ${text}`;
+            terminalLogs.appendChild(line);
+            terminalLogs.scrollTop = terminalLogs.scrollHeight;
+        }
+
+        function runExtractionSequence() {
+            terminalLogs.innerHTML = '';
+            const progressBar = document.getElementById('progress-bar');
+            const progressPercent = document.getElementById('progress-percent');
+            const progressLabel = document.getElementById('progress-label');
+
+            progressBar.style.width = '5%';
+            progressPercent.textContent = '5%';
+            progressLabel.textContent = 'DECRYPTING PACKETS...';
+
+            // Scramble all target fields
+            document.querySelectorAll('.scramble-target').forEach(el => scrambleText(el));
+
+            // Play logs
+            bootSequence.forEach((step, idx) => {
+                setTimeout(() => {
+                    addLog(step.text, step.color);
+                    const pct = Math.min(100, Math.round(((idx + 1) / bootSequence.length) * 100));
+                    progressBar.style.width = pct + '%';
+                    progressPercent.textContent = pct + '%';
+                    if (pct === 100) {
+                        progressLabel.textContent = 'DECRYPTION COMPLETE';
+                    }
+                }, step.delay);
+            });
+        }
+
+        // 5. Interactive Terminal Commands
+        const cmdInput = document.getElementById('cmd-input');
+        cmdInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = cmdInput.value.trim().toLowerCase();
+                cmdInput.value = '';
+                if (!cmd) return;
+
+                addLog(`root@sys:~$ ${cmd}`, 'text-white');
+
+                if (cmd === 'help') {
+                    addLog('Available commands: scan, dump, clear, status', 'text-green-300');
+                } else if (cmd === 'clear') {
+                    terminalLogs.innerHTML = '';
+                } else if (cmd === 'scan' || cmd === 'dump') {
+                    runExtractionSequence();
+                } else if (cmd === 'status') {
+                    addLog('TARGET: Nidiyaparambath(HO) | PIN: 673308 | STATE: KERALA [ACTIVE]', 'text-green-300');
+                } else {
+                    addLog(`Command '${cmd}' executed. Node 673308 responsive.`, 'text-yellow-400');
+                }
+            }
+        });
+
+        // 6. Button Actions & Clipboard Copy
+        document.getElementById('btn-rescan').addEventListener('click', runExtractionSequence);
+
+        function showToast(message) {
+            const toast = document.getElementById('toast-box');
+            document.getElementById('toast-msg').textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        document.getElementById('btn-copy').addEventListener('click', () => {
+            const payload = `Address: Nidiyaparambath(HO) Kunnummakkara (PO) via chombala 673308, Kozhikode
+Sub Locality 1: Kunnummakkara
+Sub Locality 2: Orkkatteri
+Locality: Vadakara
+Post Office: Kunnummakkara BO
+Pincode: 673308
+District: KOZHIKODE
+State: KERALA`;
+
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = payload;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextarea);
+
+            addLog('[SYS] Extracted address payload copied to clipboard.', 'text-green-300');
+            showToast('EXTRACTED RECORD COPIED TO CLIPBOARD');
+        });
+
+        // Start sequence on load
+        window.onload = () => {
+            runExtractionSequence();
+        };
+    </script>
+</body>
+</html>
